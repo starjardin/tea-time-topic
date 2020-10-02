@@ -106,7 +106,6 @@ function handleClicks (e) {
     listOfTopics.forEach(topic => {
       if (topic.id === buttonUpId) {
         topic.upvotes++;
-        console.log(topic.upvotes);
       }
     })
     // window.dispatchEvent( new CustomEvent(listOfTopicsUpdated));
