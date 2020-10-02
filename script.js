@@ -4,12 +4,13 @@
   3- creat a function to add topis via form
   4- listen for upvoted and downvoted
 */
-
-const list = document.querySelector(".next-topic");
+const article = document.querySelector("article");
+const listONextTopic = document.querySelector(".next-topic");
+const listOfPastopic = document.querySelector(".past-topic");
 const formEl = document.querySelector("form");
-
 const endPoint = "https://gist.githubusercontent.com/Pinois/93afbc4a061352a0c70331ca4a16bb99/raw/6da767327041de13693181c2cb09459b0a3657a1/topics.json";
 
+//state
 let listOfTopics = [];
 
 async function fecthTopics () {
@@ -20,8 +21,9 @@ async function fecthTopics () {
 };
 
 function displayListTopics (listOfTopics) {
+  const undiscussedTopic = listOfTopics.filter(topic => !topic.discussedOn);
   //create html form the list
-  const sortedList = listOfTopics.sort(function(a, b) {
+  const sortedList = undiscussedTopic.sort(function(a, b) {
     const aUpvotes = a.upvotes;
     const aDownvotes = a.downvotes;
     const aRatioVotes = aUpvotes - aDownvotes;
@@ -30,28 +32,109 @@ function displayListTopics (listOfTopics) {
     const bRationVotes = bUpvotes - bDownvotes;
     return bRationVotes - aRatioVotes;
   });
-  console.log(sortedList);
   const html = sortedList.map(topic => {
     return `
     <div class="row my-4 bg-light p-4 rounded">
       <div class="col">
         <span>${topic.title}</span>
         <div class="d-block">
-          <button type="button" class="upvoted">
-            upvoted 
+          <button type="button" class="upvotes" data-id="${topic.id}">
+            upvotes
             <span>${topic.upvotes}</span></button>
-          <button type="button" class="downvoted">
-            downvoted <span>${topic.downvotes}</span>
+          <button type="button" class="downvotes" data-id="${topic.id}">
+            downvotes <span>${topic.downvotes}</span>
           </button>
         </div>
       </div>
       <div>
-        <button class="archive">archive</button>
+        <button class="archive" data-id="${topic.id}">archive</button>
       </div>
     </div>
     `
   }).join("");
-  list.innerHTML = html;
+  listONextTopic.innerHTML = html;
+  const discussedTopics = listOfTopics.filter(topic => topic.discussedOn);
+  const htmlDiscussed = discussedTopics.map(topic => {
+    return `
+    <div class="row my-4 bg-light p-4 rounded">
+      <div class="col">
+        <span>${topic.title}</span>
+        <div class="d-block">
+          Discussed on ${topic.discussedOn}
+        </div>
+      </div>
+      <div>
+        <button class="delete t" data-id="${topic.id}">delete</button>
+      </div>
+    </div>
+    `
+  }).join("");
+  listOfPastopic.innerHTML = htmlDiscussed;
 }
+
+function addList (e) {
+  e.preventDefault();
+  const form = e.currentTarget;
+  const newTopic = {
+    id: Date.now(),
+		upvotes: 0,
+		title: form.topics.value,
+		downvotes: 0,
+		discussedOn: ""
+  }
+  listOfTopics.push(newTopic);
+  displayListTopics(listOfTopics);
+  form.reset();
+}
+
+function handleClicks (e) {
+  if (e.target.matches(".upvotes")) {
+    const buttonUpId = e.target.dataset.id;
+    listOfTopics.map(topic => {
+      if (topic.id === buttonUpId) {
+        topic.upvotes++;
+      }
+    })
+    displayListTopics(listOfTopics);
+  }
+
+  if (e.target.matches(".downvotes")) {
+    const buttonDownId = e.target.dataset.id;
+    listOfTopics.map(topic => {
+      if (topic.id === buttonDownId) {
+        topic.downvotes--;
+      }
+    })
+    displayListTopics(listOfTopics);
+  }
+
+  if (e.target.matches(".archive")) {
+    const buttonArchiveId = e.target.dataset.id;
+    const archived = listOfTopics.find(topic => topic.id === buttonArchiveId);
+    archived.discussedOn = Date.now();
+    displayListTopics(listOfTopics);
+  }
+
+  if (e.target.matches(".delete")) {
+    const buttonToDeeleteId = e.target.dataset.id;
+     listOfTopics = listOfTopics.filter(topic => topic.id !== buttonToDeeleteId);
+    displayListTopics(listOfTopics);
+  }
+}
+
+//mirror to local storage
+function mirrorTolocaStorege () {
+
+}
+
+//restore from local storage 
+
+function restoreFromLocalStorage () {
+
+}
+
+//listeners
+formEl.addEventListener("submit", addList);
+window.addEventListener('click', handleClicks);
 
 fecthTopics();
