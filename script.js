@@ -4,7 +4,7 @@
   3- creat a function to add topis via form
   4- listen for upvoted and downvoted
 */
-const article = document.querySelector("article");
+// const window = document.querySelector(".container");
 const listONextTopic = document.querySelector(".next-topic");
 const listOfPastopic = document.querySelector(".past-topic");
 const formEl = document.querySelector("form");
@@ -18,6 +18,8 @@ async function fecthTopics () {
   const data = await res.json();
   listOfTopics = [...data];
   displayListTopics(listOfTopics);
+  initToLocalStprage();
+  // window.dispatchEvent( new CustomEvent(listOfTopicsUpdated));
   return data;
 };
 
@@ -59,6 +61,7 @@ function displayListTopics (listOfTopics) {
   listONextTopic.innerHTML = html;
   const discussedTopics = listOfTopics.filter(topic => topic.discussedOn);
   const htmlDiscussed = discussedTopics.map(topic => {
+    const date = topic.discussedOn;
     return `
     <div class="row my-4 bg-light p-4 rounded">
       <div class="col">
@@ -79,37 +82,47 @@ function displayListTopics (listOfTopics) {
 function addList (e) {
   e.preventDefault();
   const form = e.currentTarget;
+  if (form.topics.value === "") return;
+  //create a new obj for the new topics
   const newTopic = {
     id: Date.now(),
-		upvotes: 0,
-		title: form.topics.value,
-		downvotes: 0,
-		discussedOn: "",
-  }
+		upvotes : 0,
+		title : form.topics.value,
+		downvotes : 0,
+		discussedOn : "",
+  };
+  // push the new topic to list of topics arr
   listOfTopics.push(newTopic);
+  // window.dispatchEvent( new CustomEvent(listOfTopicsUpdated));
   displayListTopics(listOfTopics);
+  initToLocalStprage();
   form.reset();
 }
 
 function handleClicks (e) {
   if (e.target.matches(".upvotes")) {
     const buttonUpId = e.target.dataset.id;
-    listOfTopics.map(topic => {
+    console.log(buttonUpId);
+    listOfTopics.forEach(topic => {
       if (topic.id === buttonUpId) {
         topic.upvotes++;
+        console.log(topic.upvotes);
       }
     })
+    // window.dispatchEvent( new CustomEvent(listOfTopicsUpdated));
     displayListTopics(listOfTopics);
   }
 
   if (e.target.matches(".downvotes")) {
     const buttonDownId = e.target.dataset.id;
-    listOfTopics.map(topic => {
+    listOfTopics.forEach(topic => {
       if (topic.id === buttonDownId) {
         topic.downvotes--;
       }
     })
+    // window.dispatchEvent( new CustomEvent(listOfTopicsUpdated));
     displayListTopics(listOfTopics);
+    initToLocalStprage();
   }
 
   if (e.target.matches(".archive")) {
@@ -117,12 +130,16 @@ function handleClicks (e) {
     const archived = listOfTopics.find(topic => topic.id === buttonArchiveId);
     archived.discussedOn = Date.now();
     displayListTopics(listOfTopics);
+    initToLocalStprage();
+    // window.dispatchEvent( new CustomEvent(listOfTopicsUpdated));
   }
 
   if (e.target.matches(".delete")) {
     const buttonToDeeleteId = e.target.dataset.id;
      listOfTopics = listOfTopics.filter(topic => topic.id !== buttonToDeeleteId);
     displayListTopics(listOfTopics);
+    initToLocalStprage();
+    // window.dispatchEvent( new CustomEvent(listOfTopicsUpdated));
   }
 }
 
@@ -132,18 +149,21 @@ function initToLocalStprage () {
 
 function restoreFromLocalStorage () {
   let lsItems = JSON.parse(localStorage.getItem('listOfTopics'));
-  console.log(lsItems);
   //getItems("key"), we only use key to get the value of our object
-  if (lsItems.length) {
+  if (lsItems) {
     //push the items to the actual element here.
     listOfTopics = lsItems;
     // listOfTopics.push(lsItems);
   } else {
     fecthTopics();
   }
+  displayListTopics(listOfTopics);
+  initToLocalStprage();
+  // window.dispatchEvent( new CustomEvent(listOfTopicsUpdated));
 }
+
 //listeners
 formEl.addEventListener("submit", addList);
 window.addEventListener('click', handleClicks);
-initToLocalStprage();
+// window.addEventListener("listOfTopicsUpdated", displayListTopics)
 restoreFromLocalStorage();
