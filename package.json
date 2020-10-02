@@ -1,0 +1,26 @@
+{
+  "name": "tea-time-topic",
+  "version": "1.0.0",
+  "description": "One last vanilla javascript challenge for the road 🧨",
+  "main": "script.js",
+  "dependencies": {
+    "waait": "^1.0.5"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/starjardin/tea-time-topic.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/starjardin/tea-time-topic/issues"
+  },
+  "homepage": "https://github.com/starjardin/tea-time-topic#readme",
+  "browserslist": [
+		"last 1 chrome versions"
+	]
+}
