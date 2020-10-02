@@ -16,8 +16,9 @@ let listOfTopics = [];
 async function fecthTopics () {
   const res = await fetch(`${endPoint}`);
   const data = await res.json();
-  listOfTopics.push(...data);
+  listOfTopics = [...data];
   displayListTopics(listOfTopics);
+  return data;
 };
 
 function displayListTopics (listOfTopics) {
@@ -39,15 +40,18 @@ function displayListTopics (listOfTopics) {
         <span>${topic.title}</span>
         <div class="d-block">
           <button type="button" class="upvotes" data-id="${topic.id}">
-            upvotes
-            <span>${topic.upvotes}</span></button>
+            <span>upvotes</span>
+            ${topic.upvotes}</button>
           <button type="button" class="downvotes" data-id="${topic.id}">
-            downvotes <span>${topic.downvotes}</span>
+            <span>downvotes</span> ${topic.downvotes}
           </button>
         </div>
       </div>
       <div>
-        <button class="archive" data-id="${topic.id}">archive</button>
+        <button 
+          class="archive" data-id="${topic.id}">
+          <span>archive</span>
+        </button>
       </div>
     </div>
     `
@@ -64,7 +68,7 @@ function displayListTopics (listOfTopics) {
         </div>
       </div>
       <div>
-        <button class="delete t" data-id="${topic.id}">delete</button>
+        <button class="delete t" data-id="${topic.id}"><span>delete</span></button>
       </div>
     </div>
     `
@@ -80,7 +84,7 @@ function addList (e) {
 		upvotes: 0,
 		title: form.topics.value,
 		downvotes: 0,
-		discussedOn: ""
+		discussedOn: "",
   }
   listOfTopics.push(newTopic);
   displayListTopics(listOfTopics);
@@ -122,19 +126,24 @@ function handleClicks (e) {
   }
 }
 
-//mirror to local storage
-function mirrorTolocaStorege () {
-
+function initToLocalStprage () {
+  localStorage.setItem("listOfTopics", JSON.stringify(listOfTopics));
 }
-
-//restore from local storage 
 
 function restoreFromLocalStorage () {
-
+  let lsItems = JSON.parse(localStorage.getItem('listOfTopics'));
+  console.log(lsItems);
+  //getItems("key"), we only use key to get the value of our object
+  if (lsItems.length) {
+    //push the items to the actual element here.
+    listOfTopics = lsItems;
+    // listOfTopics.push(lsItems);
+  } else {
+    fecthTopics();
+  }
 }
-
 //listeners
 formEl.addEventListener("submit", addList);
 window.addEventListener('click', handleClicks);
-
-fecthTopics();
+initToLocalStprage();
+restoreFromLocalStorage();

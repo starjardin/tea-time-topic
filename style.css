@@ -1,0 +1,31 @@
+.delete, 
+.archive,
+.downvotes,
+.upvotes {
+  background-color: #f8f9fa;
+  background-repeat: no-repeat;
+  border: none;
+  cursor: pointer;
+  background-position: center center;
+}
+
+.delete {
+  background-image: url(./assets/trash.svg);
+}
+
+.archive {
+  background-image: url(./assets/archive.svg);
+}
+
+.downvotes {
+  background-image: url(./assets/thumb-down.svg);
+}
+
+.upvotes {
+  background-image: url(./assets/thumb-up.svg);
+}
+
+button span {
+  visibility: hidden;
+}
+
